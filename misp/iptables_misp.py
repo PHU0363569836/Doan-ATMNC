@@ -1,11 +1,16 @@
 import os
 import csv
+import subprocess
+
 
 IP_FILE = "list_ip.csv"
 URL_FILE = "list_url.csv"
+SQUID_BLACKLIST_FILE = "/etc/squid/blacklist"
+
 
 ip_cache = set()
 url_cache = set()
+
 
 def load_cache_from_csv(field_name, filename):
     cache = set()
@@ -19,17 +24,27 @@ def load_cache_from_csv(field_name, filename):
                 cache.add(val)
     return cache
 
-def is_ioc_in_csv(ioc, field_name, filename):
-    # File chưa tồn tại thì chắc chắn chưa có
-    if not os.path.isfile(filename):
-        return True
+
+def block_ip_with_iptables(ip):
+    try:
+        subprocess.run(["iptables", "-C", "FORWARD", "-s", ip, "-j", "DROP"], check=True)
+        print(f"[!] IP đã bị chặn trước đó : {ip}")
+    except subprocess.CalledProcessError:
+        subprocess.run(["iptables", "-I", "FORWARD", "-s", ip, "-j", "DROP"], check=True)
+        print(f"✅ Đã chặn IP bằng iptables: {ip}")
+
+def add_url_to_squid_blacklist(url):
+    try:
+        with open(SQUID_BLACKLIST_FILE, "a") as f:
+            f.write(url + "\n")
+        print(f"✅ Đã thêm URL vào blacklist Squid: {url}")
+
+        # Reload cấu hình Squid để áp dụng thay đổi
+        subprocess.run(["squid", "-k", "reconfigure"], check=True)
     
-    with open(filename, mode="r", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row.get(field_name) == ioc:
-                return False
-    return True
+    except Exception as e:
+        print(f"[!] Lỗi khi thêm URL vào blacklist: {e}")
+
 
 def save_ioc_to_csv(filename, ioc):
     # kiểm tra ioc có tồn tại không
@@ -49,6 +64,7 @@ def save_ioc_to_csv(filename, ioc):
         
         url_cache.add(value)
         row = {"url": ioc.get("url", "")}
+        add_url_to_squid_blacklist(value)
         
     else:
         fields = ["ip_src"]
@@ -59,6 +75,7 @@ def save_ioc_to_csv(filename, ioc):
         
         ip_cache.add(value)
         row = {"ip_src": ioc.get("ip_src", "")}
+        block_ip_with_iptables(value)
 
     # Kiểm tra nếu file chưa tồn tại thì ghi header
     file_exists = os.path.isfile(filename)
@@ -70,6 +87,8 @@ def save_ioc_to_csv(filename, ioc):
             writer.writeheader()
 
         writer.writerow(row)
+
+
 
 if __name__ == "__main__":
     
