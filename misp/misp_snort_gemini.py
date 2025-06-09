@@ -175,7 +175,12 @@ def process_snort_log(LOG_FILE):
             combined_log = '\n'.join(log_buffer)  # gộp lại thành 1 chuỗi
             try:
                 ioc = extract_snort_ioc_json(combined_log)  # gọi hàm xử lý
-                save_ioc_to_csv(IP_FILE, ioc)
+                
+                #kiểm tra tag, nếu thuộc dos thì không lưu ip
+                tags = ioc.get("tag", [])
+                if "dos" not in [t.lower() for t in tags]:
+                    save_ioc_to_csv(IP_FILE, ioc)
+                    
                 send_snort_to_misp(ioc)
             except Exception as e:
                 print(f"[!] Error: {e}")
