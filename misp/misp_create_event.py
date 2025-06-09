@@ -26,6 +26,9 @@ if __name__ == "__main__":
     snort_thread.start()
     icap_thread.start()
 
+    snort_thread.join()
+    icap_thread.join()
+
     try:
         while True:
             time.sleep(1)  # Giữ cho main thread sống
