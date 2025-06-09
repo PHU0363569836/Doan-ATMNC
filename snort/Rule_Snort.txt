@@ -25,7 +25,7 @@ alert tcp any any -> 192.168.200.30 80 \
 )
 - Cách test:
 python3 slowloris.py 192.168.200.30 -p 80 -s 100
-
+sudo hping3 -c 100 -d 120 -S -w 64 -p 80 --flood --rand-source 192.168.200.30
 3. Port Scan Detection (sid:1000005)
 - Rule:
 alert tcp any any -> 192.168.200.30 any\

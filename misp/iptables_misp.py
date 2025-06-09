@@ -45,7 +45,6 @@ def save_ioc_to_csv(filename, ioc):
         value = ioc.get("url", "")
 
         if not value or value in url_cache:
-            print(f"⏭ Skipped duplicate URL: {value}")
             return
         
         url_cache.add(value)
@@ -56,7 +55,6 @@ def save_ioc_to_csv(filename, ioc):
         value = ioc.get("ip_src", "")
 
         if not value or value in ip_cache:
-            print(f"⏭ Skipped duplicate IP: {value}")
             return
         
         ip_cache.add(value)
