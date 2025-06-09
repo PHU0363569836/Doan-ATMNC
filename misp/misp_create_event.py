@@ -2,8 +2,8 @@ import os
 import sys
 import time
 import threading
-from misp.misp_snort_gemini import process_snort_log
-from misp.misp_clamav_gemini import process_icap_log
+from misp_snort_gemini import process_snort_log
+from misp_clamav_gemini import process_icap_log
 
 if __name__ == "__main__":
     SNORT_LOG_FILE = "/var/log/snort/alert"
