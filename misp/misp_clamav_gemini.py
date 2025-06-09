@@ -6,9 +6,16 @@ import re
 import requests
 from datetime import datetime
 import google.generativeai as genai
+from iptables_misp import load_cache_from_csv, save_ioc_to_csv
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+LOG_FILE = "/var/log/c-icap/virus_scan.log"
+URL_FILE = "list_url.csv"
+url_cache = set()
+
+# cache để tránh trung lặp tốc độ cao
+url_cache = load_cache_from_csv("url", URL_FILE)
 
 # --- CẤU HÌNH ---
 MISP_URL = os.getenv("MISP_URL")
@@ -154,13 +161,14 @@ def process_icap_log(LOG_FILE):
         
         try:
             ioc = extract_clamav_ioc_json(log_line)  # gọi hàm xử lý
+            save_ioc_to_csv(URL_FILE, ioc)
             send_clamav_to_misp(ioc)
         except Exception as e:
             print(f"[!] Error: {e}")
 
 # --- MAIN LOOP ---
 if __name__ == "__main__":
-    LOG_FILE = "/var/log/c-icap/virus_scan.log"
+    
     if not os.path.exists(LOG_FILE):
         print(f"Log file not found: {LOG_FILE}")
         sys.exit(1)

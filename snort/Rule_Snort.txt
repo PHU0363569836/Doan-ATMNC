@@ -1,6 +1,6 @@
 1. SQL Injection Attempt
 - Rule:
-drop tcp any any -> 192.168.200.30 80\
+drop tcp any any -> 192.168.200.30 80 \
 (\
     msg:"SQL Injection Attempt";\
     flow:to_server,established;\
@@ -15,7 +15,7 @@ nhập: ' OR '1'='1
 
 2. DoS / Slowloris (sid:1000007)
 - Rule:
-alert tcp any any -> 192.168.200.30 80\
+alert tcp any any -> 192.168.200.30 80 \
 (\
     msg:"DoS or Slowloris Attempt";\
     flow:to_server,established;\
@@ -60,6 +60,7 @@ alert tcp any any -> 192.168.200.30 80 \
     sid:1000005;\
     rev:1;\
 )
+
 
 
 

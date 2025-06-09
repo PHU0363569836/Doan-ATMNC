@@ -6,9 +6,16 @@ import re
 import requests
 from datetime import datetime
 import google.generativeai as genai
+from iptables_misp import load_cache_from_csv, save_ioc_to_csv
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+LOG_FILE = "/var/log/snort/alert"
+IP_FILE = "list_ip.csv"
+ip_cache = set()
+
+# cache để tránh trung lặp tốc độ cao
+ip_cache = load_cache_from_csv("ip_src", IP_FILE)
 
 # --- CẤU HÌNH ---
 MISP_URL = os.getenv("MISP_URL")
@@ -158,7 +165,6 @@ def send_snort_to_misp(ioc):
 def process_snort_log(LOG_FILE):
     
     log_buffer = []
-    
     for log_line in follow(LOG_FILE):
         if '[**]' in log_line:
             log_buffer.clear()
@@ -169,6 +175,7 @@ def process_snort_log(LOG_FILE):
             combined_log = '\n'.join(log_buffer)  # gộp lại thành 1 chuỗi
             try:
                 ioc = extract_snort_ioc_json(combined_log)  # gọi hàm xử lý
+                save_ioc_to_csv(IP_FILE, ioc)
                 send_snort_to_misp(ioc)
             except Exception as e:
                 print(f"[!] Error: {e}")
@@ -176,7 +183,7 @@ def process_snort_log(LOG_FILE):
             
 # --- MAIN LOOP ---
 if __name__ == "__main__":
-    LOG_FILE = "/var/log/snort/alert"
+    
     if not os.path.exists(LOG_FILE):
         print(f"Log file not found: {LOG_FILE}")
         sys.exit(1)
