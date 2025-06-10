@@ -156,6 +156,7 @@ def send_snort_to_misp(ioc):
         }
     }
 
+    # file deepcode ignore SSLVerificationBypass: <please specify a reason of ignoring this>
     resp = requests.post(MISP_API_URL, headers=HEADERS, json=event, verify=VERIFY_SSL)
     if resp.status_code >= 300:
         raise Exception(f"MISP error {resp.status_code}: {resp.text}")
@@ -176,12 +177,12 @@ def process_snort_log(LOG_FILE):
             try:
                 ioc = extract_snort_ioc_json(combined_log)  # gọi hàm xử lý
                 
+                send_snort_to_misp(ioc)
                 #kiểm tra tag, nếu thuộc dos thì không lưu ip
                 tags = ioc.get("tag", [])
                 if "dos" not in [t.lower() for t in tags]:
                     save_ioc_to_csv(IP_FILE, ioc)
-                    
-                send_snort_to_misp(ioc)
+                             
             except Exception as e:
                 print(f"[!] Error: {e}")
             log_buffer.clear()

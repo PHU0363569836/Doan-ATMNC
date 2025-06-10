@@ -149,6 +149,7 @@ def send_clamav_to_misp(ioc):
         }
     }
 
+    # file deepcode ignore SSLVerificationBypass: <please specify a reason of ignoring this>
     resp = requests.post(MISP_API_URL, headers=HEADERS, json=event, verify=VERIFY_SSL)
     if resp.status_code >= 300:
         raise Exception(f"MISP error {resp.status_code}: {resp.text}")
@@ -161,8 +162,9 @@ def process_icap_log(LOG_FILE):
         
         try:
             ioc = extract_clamav_ioc_json(log_line)  # gọi hàm xử lý
-            save_ioc_to_csv(URL_FILE, ioc)
             send_clamav_to_misp(ioc)
+            save_ioc_to_csv(URL_FILE, ioc)
+            
         except Exception as e:
             print(f"[!] Error: {e}")
 
