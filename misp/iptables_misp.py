@@ -87,6 +87,7 @@ def save_ioc_to_csv(filename, ioc, ioc_cache):
             writer.writeheader()
 
         writer.writerow(row)
+        print(f"lưu thành công ip vào {filename}")
 
 
 

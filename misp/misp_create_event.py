@@ -6,8 +6,8 @@ from misp_snort_gemini import process_snort_log
 from misp_clamav_gemini import process_icap_log
 from iptables_misp import load_cache_from_csv
 
-IP_FILE = "list_ip.csv"
-URL_FILE = "list_url.csv"
+IP_FILE = "/home/firewall/Desktop/GITHUB_ATMNC/misp/list_ip.csv"
+URL_FILE = "/home/firewall/Desktop/GITHUB_ATMNC/misp/list_url.csv"
 ip_cache = set()
 url_cache = set()
 
@@ -30,8 +30,8 @@ if __name__ == "__main__":
 
     print(f"Monitoring {SNORT_LOG_FILE} And {ICAP_LOG_FILE}...")
     
-    snort_thread = threading.Thread(target=process_snort_log, args=(SNORT_LOG_FILE, SNORT_LOG_FILE, ip_cache, ), daemon=True)
-    icap_thread = threading.Thread(target=process_icap_log, args=(ICAP_LOG_FILE, ICAP_LOG_FILE, url_cache, ), daemon=True)
+    snort_thread = threading.Thread(target=process_snort_log, args=(SNORT_LOG_FILE, IP_FILE , ip_cache, ), daemon=True)
+    icap_thread = threading.Thread(target=process_icap_log, args=(ICAP_LOG_FILE, URL_FILE, url_cache, ), daemon=True)
 
     snort_thread.start()
     icap_thread.start()
