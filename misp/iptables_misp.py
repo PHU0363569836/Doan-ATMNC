@@ -62,7 +62,7 @@ def save_ioc_to_csv(filename, ioc, ioc_cache):
         if not value or value in ioc_cache:
             return
         
-        url_cache.add(value)
+        ioc_cache.add(value)
         row = {"url": ioc.get("url", "")}
         add_url_to_squid_blacklist(value)
         
@@ -73,7 +73,7 @@ def save_ioc_to_csv(filename, ioc, ioc_cache):
         if not value or value in ioc_cache:
             return
         
-        ip_cache.add(value)
+        ioc_cache.add(value)
         row = {"ip_src": ioc.get("ip_src", "")}
         block_ip_with_iptables(value)
 
