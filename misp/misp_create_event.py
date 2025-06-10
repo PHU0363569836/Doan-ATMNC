@@ -4,6 +4,16 @@ import time
 import threading
 from misp_snort_gemini import process_snort_log
 from misp_clamav_gemini import process_icap_log
+from iptables_misp import load_cache_from_csv
+
+IP_FILE = "list_ip.csv"
+URL_FILE = "list_url.csv"
+ip_cache = set()
+url_cache = set()
+
+# cache để tránh trung lặp tốc độ cao
+ip_cache = load_cache_from_csv("ip_src", IP_FILE)
+url_cache = load_cache_from_csv("url", URL_FILE)
 
 if __name__ == "__main__":
     SNORT_LOG_FILE = "/var/log/snort/alert"
@@ -20,8 +30,8 @@ if __name__ == "__main__":
 
     print(f"Monitoring {SNORT_LOG_FILE} And {ICAP_LOG_FILE}...")
     
-    snort_thread = threading.Thread(target=process_snort_log, args=(SNORT_LOG_FILE,), daemon=True)
-    icap_thread = threading.Thread(target=process_icap_log, args=(ICAP_LOG_FILE,), daemon=True)
+    snort_thread = threading.Thread(target=process_snort_log, args=(SNORT_LOG_FILE, ip_cache, ), daemon=True)
+    icap_thread = threading.Thread(target=process_icap_log, args=(ICAP_LOG_FILE, url_cache, ), daemon=True)
 
     snort_thread.start()
     icap_thread.start()

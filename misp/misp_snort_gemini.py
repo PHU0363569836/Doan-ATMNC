@@ -10,12 +10,7 @@ from iptables_misp import load_cache_from_csv, save_ioc_to_csv
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-LOG_FILE = "/var/log/snort/alert"
-IP_FILE = "list_ip.csv"
-ip_cache = set()
 
-# cache để tránh trung lặp tốc độ cao
-ip_cache = load_cache_from_csv("ip_src", IP_FILE)
 
 # --- CẤU HÌNH ---
 MISP_URL = os.getenv("MISP_URL")
@@ -163,7 +158,7 @@ def send_snort_to_misp(ioc):
     print(f"✔ MISP event created for rule: {rule_name}")
 
 
-def process_snort_log(LOG_FILE):
+def process_snort_log(LOG_FILE, ip_cache):
     
     log_buffer = []
     for log_line in follow(LOG_FILE):
@@ -181,7 +176,7 @@ def process_snort_log(LOG_FILE):
                 #kiểm tra tag, nếu thuộc dos thì không lưu ip
                 tags = ioc.get("tag", [])
                 if "dos" not in [t.lower() for t in tags]:
-                    save_ioc_to_csv(IP_FILE, ioc)
+                    save_ioc_to_csv(IP_FILE, ioc, ip_cache)
                              
             except Exception as e:
                 print(f"[!] Error: {e}")
@@ -190,12 +185,18 @@ def process_snort_log(LOG_FILE):
 # --- MAIN LOOP ---
 if __name__ == "__main__":
     
+    LOG_FILE = "/var/log/snort/alert"
+    IP_FILE = "list_ip.csv"
+    ip_cache = set()
+
+    # cache để tránh trung lặp tốc độ cao
+    ip_cache = load_cache_from_csv("ip_src", IP_FILE)
     if not os.path.exists(LOG_FILE):
         print(f"Log file not found: {LOG_FILE}")
         sys.exit(1)
 
     print(f"Monitoring {LOG_FILE}...")
-    process_snort_log(LOG_FILE)
+    process_snort_log(LOG_FILE, ip_cache)
 
     
     
