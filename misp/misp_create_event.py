@@ -30,8 +30,8 @@ if __name__ == "__main__":
 
     print(f"Monitoring {SNORT_LOG_FILE} And {ICAP_LOG_FILE}...")
     
-    snort_thread = threading.Thread(target=process_snort_log, args=(SNORT_LOG_FILE, ip_cache, ), daemon=True)
-    icap_thread = threading.Thread(target=process_icap_log, args=(ICAP_LOG_FILE, url_cache, ), daemon=True)
+    snort_thread = threading.Thread(target=process_snort_log, args=(SNORT_LOG_FILE, SNORT_LOG_FILE, ip_cache, ), daemon=True)
+    icap_thread = threading.Thread(target=process_icap_log, args=(ICAP_LOG_FILE, ICAP_LOG_FILE, url_cache, ), daemon=True)
 
     snort_thread.start()
     icap_thread.start()

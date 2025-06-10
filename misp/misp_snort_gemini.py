@@ -158,7 +158,7 @@ def send_snort_to_misp(ioc):
     print(f"✔ MISP event created for rule: {rule_name}")
 
 
-def process_snort_log(LOG_FILE, ip_cache):
+def process_snort_log(LOG_FILE, IP_FILE, ip_cache):
     
     log_buffer = []
     for log_line in follow(LOG_FILE):
@@ -196,7 +196,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print(f"Monitoring {LOG_FILE}...")
-    process_snort_log(LOG_FILE, ip_cache)
+    process_snort_log(LOG_FILE, IP_FILE, ip_cache)
 
     
     

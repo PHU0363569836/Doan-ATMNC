@@ -150,7 +150,7 @@ def send_clamav_to_misp(ioc):
         raise Exception(f"MISP error {resp.status_code}: {resp.text}")
     print(f"✔ MISP event created for rule: {virus_name}")
 
-def process_icap_log(LOG_FILE, url_cache):
+def process_icap_log(LOG_FILE, URL_FILE, url_cache):
     for log_line in follow(LOG_FILE):
         if "[Action: blocked]" not in log_line:
             continue
@@ -178,5 +178,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print(f"Monitoring {LOG_FILE}...")
-    process_icap_log(LOG_FILE, url_cache)
+    process_icap_log(LOG_FILE, URL_FILE, url_cache)
 
