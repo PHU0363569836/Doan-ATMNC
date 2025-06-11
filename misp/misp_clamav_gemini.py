@@ -77,7 +77,7 @@ def extract_clamav_ioc_json(log_line):
         "- url: the full URL that was accessed and scanned\n"
         "- action: what ClamAV or the ICAP server decided to do (e.g., 'blocked', 'passed')\n"
         "- virus_name: the name of the virus detected (e.g., 'Eicar-Test-Signature')\n"
-        "- tag: always return malware-download as the default tag\n"
+        "- tag: always return ['malware-download'] as the default tag\n"
         "\nOnly return valid JSON. Do not explain.\n\n"
         f"Log: {log_line.strip()}"
     )
