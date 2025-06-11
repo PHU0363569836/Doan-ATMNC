@@ -4,7 +4,7 @@ drop tcp any any -> 192.168.200.30 80 \
 (\
     msg:"SQL Injection Attempt";\
     flow:to_server,established;\
-    content:"' OR '1'='1"; nocase;\
+    content:"%27+OR+%271%27%3D%271"; nocase;\
     threshold:type threshold, track by_src, count 10, seconds 60;\ 
     sid:1000001;\
     rev:1\
